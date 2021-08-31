@@ -54,37 +54,83 @@ server.register(Inert, (err) => {
 
     server.route({
         method: 'POST',
+        path: '/addUserToAccount',
+        config: {
+            validate: {
+                payload:
+                    Joi.object({
+                        username: Joi.string().required(),
+                        phone: Joi.number().required(),
+                        email: Joi.string().required(),
+                        password: Joi.string().required(),
+                        account_id: Joi.number().required(),
+                    })
+            }
+        },
+        handler: function (request, reply) {
+            let userData = {};
+            if (request) {
+                userData = { ...request.payload }
+                userData.role_id = 2;
+                console.log('caled')
+
+                pool.on('error', (err, client) => {
+                    console.error('Unexpected error on idle client', err)
+                    process.exit(-1)
+                });
+                userData.account_id = +userData.account_id;
+                const userInsertQuery = 'INSERT INTO userdetails(username, phone, email, password, account_id, role_id) VALUES ($1, $2, $3, $4, $5, $6)'
+                const insertValues = [userData.username, userData.phone, userData.email, userData.password, userData.account_id, userData.role_id];
+                pool.connect((err, client, done) => {
+                    if (err) throw err
+                    done();
+                    client.query(userInsertQuery, insertValues, (err, res) => {
+                        if (err) {
+                            console.log('Error in inserting data in User Table', err.stack);
+                        } else {
+                            console.log('Success')
+                            // ejs.renderFile(dashboard, { username: userData.username }, {}, (err, str) => {
+                            //     reply(str).header('Content-Type', 'text/html');
+                            // })
+                        }
+                    });
+                })
+
+            }
+        }
+    });
+
+    server.route({
+        method: 'POST',
         path: '/validateLogin',
         handler: function (request, reply) {
             if (request) {
-                let username = request.payload.username;
+                let email = request.payload.email;
                 let password = request.payload.password;
-                ejs.renderFile(dashboard, { username: username }, {}, (err, str) => {
-                    if (err) {
-                        console.log('Error', err);
-                    } else {
-                        pool.on('error', (err, client) => {
-                            console.error('Unexpected error on idle client', err)
-                            process.exit(-1)
-                        });
-                        pool.connect((err, client, done) => {
-                            if (err) throw err
-                            done();
-                            client.query(`SELECT password FROM userdetails where username = '${username}'`, (err, res) => {
-                                if (err) {
-                                    console.log('Error in retrieving data from accountdetails', err.stack);
-                                } else {
-                                    let fetchedPass = res.rows[0].password;
-                                    if (password === fetchedPass) {
-                                        console.log('Valid');
-                                        reply(str).header('Content-Type', 'text/html');
-                                    } else {
-                                        console.log('Invalid credentials');
-                                    }
-                                }
-                            });
-                        });
-                    }
+                pool.on('error', (err, client) => {
+                    console.error('Unexpected error on idle client', err)
+                    process.exit(-1)
+                });
+                pool.connect((err, client, done) => {
+                    if (err) throw err
+                    done();
+                    client.query(`SELECT password,username,account_id FROM userdetails where email = '${email}'`, (err, res) => {
+                        if (err) {
+                            console.log('Error in retrieving data from accountdetails', err.stack);
+                        } else {
+                            let userInfo = res.rows[0];
+                            console.log(res.rows[0].password, 'userInfo1')
+                            let fetchedPass = userInfo.password;
+                            if (password === fetchedPass) {
+                                console.log('Valid');
+                                ejs.renderFile(dashboard, { username: userInfo.username, account_id: userInfo.account_id }, {}, (err, str) => {
+                                    reply(str).header('Content-Type', 'text/html');
+                                })
+                            } else {
+                                console.log('Invalid credentials');
+                            }
+                        }
+                    });
                 });
             }
         }
@@ -139,13 +185,13 @@ server.register(Inert, (err) => {
                                 } else {
                                     const account_id = res.rows[0].account_id;
                                     const userInsertQuery = 'INSERT INTO userdetails(username, phone, email, password, account_id, role_id) VALUES ($1, $2, $3, $4, $5, $6)'
-                                    const insertValues = [userData.username, userData.phone, userData.email, userData.password, account_id, 1]
+                                    const insertValues = [userData.username, userData.phone, userData.email, userData.password, account_id, userData.role_id]
                                     client.query(userInsertQuery, insertValues, (err, res) => {
                                         if (err) {
                                             console.log('Error in inserting data in User Table', err.stack);
                                         } else {
-                                            console.log('endd')
-                                            ejs.renderFile(dashboard, { username: userData.username  }, {}, (err, str) => {
+                                            console.log('Success')
+                                            ejs.renderFile(dashboard, { username: userData.username }, {}, (err, str) => {
                                                 reply(str).header('Content-Type', 'text/html');
                                             })
                                         }
