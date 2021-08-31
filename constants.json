@@ -1,0 +1,11 @@
+{
+    "db_connect": [
+        {
+            "user": "sivanesh",
+            "host": "localhost",
+            "database": "App",
+            "password": "",
+            "port": 5432
+        }
+    ]
+}
