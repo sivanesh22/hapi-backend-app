@@ -1,0 +1,17 @@
+{
+    "dbConfig": {
+        "user": "sivanesh",
+        "host": "localhost",
+        "database": "App",
+        "password": "",
+        "port": 5432
+    },
+    "server": {
+        "port": 5050,
+        "host": "localhost"
+    },
+    "roles": {
+        "accountOwnerId": 1,
+        "userId": 2
+    }
+}
