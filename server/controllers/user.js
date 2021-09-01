@@ -1,4 +1,4 @@
-const UserModal = require('../modals/User');
+const UserModal = require('../models/User');
 
 function addUser(request, reply) {
     let userData = {};

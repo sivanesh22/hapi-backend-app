@@ -1,5 +1,5 @@
 const loginPath = './screens/login.html';
-const UserModal = require('../modals/User');
+const UserModal = require('../models/User');
 const dashboard = './screens/dashboard.html';
 let ejs = require('ejs');
 

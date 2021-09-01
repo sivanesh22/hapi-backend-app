@@ -1,5 +1,5 @@
-const UserModal = require('../modals/User');
-const AccountModal = require('../modals/Account');
+const UserModal = require('../models/User');
+const AccountModal = require('../models/Account');
 let ejs = require('ejs');
 
 function saveAccountandUser(request, reply) {
