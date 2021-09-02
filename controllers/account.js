@@ -27,6 +27,7 @@ function saveAccountandUser(request, reply) {
                     role_id: userData.role_id
                 });
                 addUser.then(d => {
+                    // res({ id_token: createToken(user) }).code(201);
                     ejs.renderFile(dashboard, { username: userData.username }, {}, (err, str) => {
                         reply(str).header('Content-Type', 'text/html');
                     })

@@ -9,7 +9,13 @@ const signup = {
 const login = {
     method: 'GET',
     path: '/login',
-    handler: loginController.signup
+    config: {
+        handler: loginController.signup,
+        auth: {
+            strategy: 'jwt',
+        },
+    }
+
 }
 
 const validateLogin = {
