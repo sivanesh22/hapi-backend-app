@@ -2,13 +2,23 @@
 
 const Hapi = require('hapi');
 const Inert = require('inert');
+const ejs = require('ejs');
 const server = new Hapi.Server();
 const db = require('./config/database');
 const Routes = require('./routes/index')
-const config = require('config');
+const vision = require('vision');
 const secret = require('./config/config');
 
-db.authenticate().then(() => console.log('Database connected in postgres')).catch(err => console.log('Error in connection' + err));
+(async function () {
+    try {
+        await db.authenticate();
+        console.log('Database connected in postgres')
+    } catch (e) {
+        console.error(e,'database connection failed');
+    }
+})();
+
+// db.authenticate().then(() => console.log('Database connected in postgres')).catch(err => console.log('Error in connection' + err));
 
 
 
@@ -18,8 +28,6 @@ server.connection({
 });
 
 
-
-
 server.start(function (err) {
     if (err) {
         console.log('Error in start', err);
@@ -27,28 +35,47 @@ server.start(function (err) {
     console.log('Server started at: ', server.info.uri);
 });
 
-
-// 
-
-server.register(Inert, (err) => {
+server.register(vision, (err) => {
     if (err) {
-        console.log('Error in Inert');
+        throw err;
     }
+    server.views({
+        engines: { html: ejs },
+        path: __dirname
+    });
 
-    server.register(require('hapi-auth-jwt'), (err) => {
+    // server.route({
+    //     method: 'GET',
+    //     path: '/',
+    //     handler: (request, reply) => {
+    //         return reply.view('./screens/index.html', { title: 'Home page' });
+    //     }
+    // });
+    server.register(Inert, (err) => {
         if (err) {
             console.log('Error in Inert');
         }
-        server.auth.strategy('jwt', 'jwt', 'required', {
-            key: secret,
-            verifyOptions: { algorithms: ['HS256'] }
+
+        server.register(require('hapi-auth-jwt'), (err) => {
+            if (err) {
+                console.log('Error in Inert');
+            }
+            server.auth.strategy('jwt', 'jwt', {
+                key: secret,
+                verifyOptions: { algorithms: ['HS256'] },
+                validateFunction: {
+
+                }
+            });
+
+
+            Routes.forEach(data => {
+                server.route(data)
+            })
+
         });
-
-
-        Routes.forEach(data => {
-            server.route(data)
-        })
 
     });
 
-});
+})
+

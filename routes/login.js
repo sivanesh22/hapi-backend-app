@@ -6,16 +6,21 @@ const signup = {
     handler: loginController.signup
 }
 
+const home = {
+    method: 'GET',
+    path: '/',
+    handler: loginController.signup
+}
+
 const login = {
     method: 'GET',
     path: '/login',
     config: {
         handler: loginController.signup,
-        auth: {
-            strategy: 'jwt',
-        },
+        // auth: {
+        //     strategy: 'jwt',
+        // },
     }
-
 }
 
 const validateLogin = {
@@ -26,5 +31,5 @@ const validateLogin = {
 
 
 module.exports = [
-    signup, login, validateLogin
+    signup, login, validateLogin,home
 ]
