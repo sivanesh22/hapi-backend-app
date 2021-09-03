@@ -3,30 +3,31 @@ const loginController = require('../controllers/login')
 const signup = {
     method: 'GET',
     path: '/signup',
-    handler: loginController.signup
+    handler: loginController.signup,
+    config: { auth: false }
 }
 
 const home = {
     method: 'GET',
-    path: '/',
-    handler: loginController.signup
+    path: '/login',
+    handler: loginController.signup,
+    config: { auth: false }
 }
 
 const login = {
     method: 'GET',
-    path: '/login',
+    path: '/',
     config: {
         handler: loginController.signup,
-        // auth: {
-        //     strategy: 'jwt',
-        // },
+        auth: false 
     }
 }
 
 const validateLogin = {
     method: 'POST',
     path: '/validateLogin',
-    handler: loginController.validateLogin
+    handler: loginController.validateLogin,
+    config: { auth: false }
 };
 
 

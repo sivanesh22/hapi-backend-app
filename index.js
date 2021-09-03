@@ -8,74 +8,62 @@ const db = require('./config/database');
 const Routes = require('./routes/index')
 const vision = require('vision');
 const secret = require('./config/config');
+const UserModal = require('./models/User');
 
 (async function () {
     try {
         await db.authenticate();
         console.log('Database connected in postgres')
     } catch (e) {
-        console.error(e,'database connection failed');
+        console.error(e, 'database connection failed');
     }
-})();
 
-// db.authenticate().then(() => console.log('Database connected in postgres')).catch(err => console.log('Error in connection' + err));
-
-
-
-server.connection({
-    port: 5050,
-    host: "localhost"
-});
+    server.connection({
+        port: 5050,
+        host: "localhost"
+    });
 
 
-server.start(function (err) {
-    if (err) {
-        console.log('Error in start', err);
-    }
-    console.log('Server started at: ', server.info.uri);
-});
+    server.start(function (err) {
+        if (err) {
+            console.log('Error in start', err);
+        }
+        console.log('Server started at: ', server.info.uri);
+    });
 
-server.register(vision, (err) => {
-    if (err) {
-        throw err;
-    }
+
+    await server.register(vision)
     server.views({
         engines: { html: ejs },
         path: __dirname
     });
+    await server.register(Inert)
 
-    // server.route({
-    //     method: 'GET',
-    //     path: '/',
-    //     handler: (request, reply) => {
-    //         return reply.view('./screens/index.html', { title: 'Home page' });
-    //     }
-    // });
-    server.register(Inert, (err) => {
-        if (err) {
-            console.log('Error in Inert');
-        }
-
-        server.register(require('hapi-auth-jwt'), (err) => {
-            if (err) {
-                console.log('Error in Inert');
+    async function validate(decoded, request, callback) {
+        const results = await UserModal.findAll({
+            attributes: ['password', 'username', 'account_id', 'email'],
+            where: {
+                email: decoded.email
             }
-            server.auth.strategy('jwt', 'jwt', {
-                key: secret,
-                verifyOptions: { algorithms: ['HS256'] },
-                validateFunction: {
-
-                }
-            });
-
-
-            Routes.forEach(data => {
-                server.route(data)
-            })
-
         });
+        if (results.length) {
+            return callback(null, true);
+        } else {
+            return callback(null, false);
+        }
+    };
 
+    await server.register(require('hapi-auth-jwt2'))
+    server.auth.strategy('jwt', 'jwt', {
+        key: secret,
+        validateFunc: validate,
+        verifyOptions: { algorithms: ['HS256'] },
     });
 
-})
+    server.auth.default('jwt');
 
+    Routes.forEach(data => {
+        server.route(data)
+    })
+
+})();

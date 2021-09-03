@@ -2,22 +2,23 @@ const Joi = require('joi');
 
 const accountController = require('../controllers/account');
 
-const saveAccountandUser={
-    method: 'POST',
-    config: {
-        validate: {
-            payload:
-                Joi.object({
-                    username: Joi.string().required(),
-                    phone: Joi.number().required(),
-                    email: Joi.string().required(),
-                    password: Joi.string().required(),
-                    account: Joi.string().required()
-                })
-        },
-        handler: accountController.saveAccountandUser 
+const saveAccountandUser = {
+  method: 'POST',
+  config: {
+    validate: {
+      payload:
+        Joi.object({
+          username: Joi.string().required(),
+          phone: Joi.number().required(),
+          email: Joi.string().required(),
+          password: Joi.string().required(),
+          account: Joi.string().required()
+        })
     },
-    path: '/saveAccountandUser',
+    handler: accountController.saveAccountandUser,
+    auth: false,    
+  },
+  path: '/saveAccountandUser',
 };
 
 // const listAllUsers={
@@ -29,6 +30,6 @@ const saveAccountandUser={
 // };
 
 
-module.exports=[
-    saveAccountandUser
+module.exports = [
+  saveAccountandUser
 ]

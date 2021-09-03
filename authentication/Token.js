@@ -6,7 +6,7 @@ const secret = require('../config/config');
 const store = require('store')
 
 function createToken(user) {
-    return jwt.sign({ username: user }, secret, { algorithm: 'HS256', expiresIn: "10h" });
+    return jwt.sign({ email: user }, secret, { algorithm: 'HS256', expiresIn: "10h" });
 }
 
 function authenticate() {

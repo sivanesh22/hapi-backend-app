@@ -1,16 +1,16 @@
-const Sequelize = require('sequelize')
-const db = require('../config/database')
-var Account = db.define('account', {
+const Role = db.define('role', {
     id: {
         field: 'id',
         type: Sequelize.INTEGER,
-        autoIncrement: true,
         primaryKey: true
     },
-    accountName: {
-        field: 'account_name',
-        type: Sequelize.STRING,
-        unique: true
+    roleName: {
+        field: 'role_name',
+        type: Sequelize.STRING
+    },
+    accountId: {
+        field: 'account_id',
+        type: Sequelize.INTEGER
     },
     createdAt: {
         field: 'created_at',
@@ -24,10 +24,6 @@ var Account = db.define('account', {
         field: 'deleted_at',
         type: Sequelize.DATE
     }
-}
-    , {
-        freezeTableName: true
-    }
-);
-module.exports = Account;
-
+})
+​
+module.exports = Role;
