@@ -1,4 +1,7 @@
 
-const key = 'secretkey';
+const secret = 'secretkey';
+const tinyUrlLength = 6;
 
-module.exports = key;
+module.exports = {
+    secret, tinyUrlLength
+};

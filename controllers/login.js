@@ -2,7 +2,6 @@ const loginPath = './screens/login.html';
 const UserModal = require('../models/User');
 const dashboard = './screens/dashboard.html';
 const { createToken } = require('../authentication/Token')
-const store = require('store');
 
 
 function signup(request, reply) {
@@ -20,7 +19,7 @@ async function validateLogin(request, reply) {
         var results = []
         try {
             results = await UserModal.findAll({
-                attributes: ['password', 'username', 'account_id','email'],
+                attributes: ['password', 'username', 'account_id', 'email', 'id'],
                 where: {
                     email: email
                 }
@@ -52,5 +51,12 @@ async function validateLogin(request, reply) {
 module.exports = {
     signup,
     login,
-    validateLogin
+    validateLogin,
 }
+
+// "data", {
+//     userId: results[0].dataValues.id,
+//     accountId: results[0].dataValues.account_id,
+//     username: results[0].dataValues.username,
+//     userEmail: results[0].dataValues.email,
+// }

@@ -1,8 +1,12 @@
-const Role = db.define('role', {
+
+const Sequelize = require('sequelize')
+const db = require('../config/database')
+var Role = db.define('role', {
     id: {
         field: 'id',
         type: Sequelize.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true,
     },
     roleName: {
         field: 'role_name',
@@ -24,6 +28,10 @@ const Role = db.define('role', {
         field: 'deleted_at',
         type: Sequelize.DATE
     }
-})
-​
+}
+    , {
+        freezeTableName: true
+    }
+);
 module.exports = Role;
+

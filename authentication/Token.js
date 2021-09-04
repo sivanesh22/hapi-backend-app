@@ -2,7 +2,7 @@
 'use strict';
 
 const jwt = require('jsonwebtoken');
-const secret = require('../config/config');
+const { secret } = require('../config/config');
 const store = require('store')
 
 function createToken(user) {

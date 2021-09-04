@@ -112,10 +112,14 @@
 
 <body>
 
-    <h1>Hai <p>
-            <%= username %>!!!.This is your dashboard
-        </p>
-    </h1>
+    <p>
+        Hai <%= username %>!!!.This is your dashboard
+    </p>
+    <form action="/generateTinyURL" method="post">
+        <input type="text" name='longUrl' value='https://www.netflix.com/' />
+        <button type="submit"> Create Tiny Url </button>
+    </form>
+
     <button onclick="openModal()"> Add User</button>
 
     <div id="modal_container" class="modal_container">
@@ -126,13 +130,14 @@
             <div id="signup_container">
                 <form action="/addUserToAccount" method="post">
                     <div class="top-row">
-                        <input type="hidden" name='account_id' value=<%= account_id %> />
+                        <input type="hidden" name='account_id' value=<%=account_id %> />
                         <div class="field-wrap">
                             <input type="text" autocomplete="off" placeholder="Name" name='username' value='raj' />
                         </div>
 
                         <div class="field-wrap">
-                            <input type="text" autocomplete="off" placeholder="Phone number" name='phone'  value="9031230130"/>
+                            <input type="text" autocomplete="off" placeholder="Phone number" name='phone'
+                                value="9031230130" />
                         </div>
                     </div>
 

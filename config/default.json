@@ -8,7 +8,8 @@
     },
     "server": {
         "port": 5050,
-        "host": "localhost"
+        "host": "localhost",
+        "transferProtocol": "http"
     },
     "roles": {
         "accountOwnerId": 1,
