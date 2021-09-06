@@ -5,14 +5,14 @@ const generateTinyURL = {
     method: 'POST',
     path: '/generateTinyURL',
     handler: tinyUrlController.generateTinyURL,
-    config: { auth: false }
+    config: { auth: 'jwt' }
 }
 
 const redirectTinyUrl = {
     method: 'GET',
     path: '/{code}',
     handler: tinyUrlController.redirectTinyUrl,
-    config: { auth: false }
+    config: { auth: 'jwt' }
 }
 
 

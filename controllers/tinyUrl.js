@@ -1,48 +1,44 @@
 
 const validUrl = require('valid-url')
 const { nanoid } = require('nanoid')
-// const { server } = require('../config/default.json');
 const { tinyUrlLength } = require('../config/config');
 const TinyUrlModal = require('../models/TinyUrl');
+const UserModal = require('../models/User');
 const dashboard = './screens/dashboard.html';
 
 
 async function generateTinyURL(request, reply) {
-    // const longUrl = 'https://www.netflix.com/';
+    const email = request.auth.credentials.email;
+    const userObj= await UserModal.findOne({ attributes: ['id','accountId'], where: { email: email } })
+    const userId=userObj.dataValues.id;
+    const accountId=userObj.dataValues.accountId;
     let longUrl = request.payload.longUrl;
-    // const baseUrl = `${server.transferProtocol}:${server.host}:${server.port}`;
-    // if (!validUrl.isUri(baseUrl)) {
-    //     return res.status(401).json('Invalid base URL')
-    // }
     const shortUrl = nanoid(tinyUrlLength)
-    // const shortUrl = baseUrl + '/' + urlCode
     if (validUrl.isUri(longUrl)) {
         try {
             const url = await TinyUrlModal.findAll({
                 attributes: ['tiny_url', 'original_url'],
                 where: {
-                    userId: 3,
+                    userId: userId,
                     originalUrl: longUrl
                 }
             });
             if (url.length) {
                 console.log('exists')
-                // reply.redirect(url[0].dataValues.original_url)
             } else {
                 await TinyUrlModal.create({
                     originalUrl: longUrl,
                     tinyUrl: shortUrl,
                     isActive: true,
-                    userId: 3,
-                    accountId: 1,
+                    userId: userId,
+                    accountId: accountId,
                     // expiryDate: '',
                     // createdAt: '',
                     // updatedAt: '',
                 });
-                console.log(shortUrl, 'shortUrl')
                 reply.view(dashboard, {
                     username: 'Siva',
-                    account_id: 1
+                    account_id: accountId
                 })
             }
         }
@@ -53,17 +49,19 @@ async function generateTinyURL(request, reply) {
     } else {
         console.log('Invalid longUrl')
     }
-    // reply.file(loginPath);
 }
 
 
 async function redirectTinyUrl(request, reply) {
     const { code } = request.params;
+    const email = request.auth.credentials.email;
+    const userObj= await UserModal.findOne({ attributes: ['id'], where: { email: email } })
+    const userId=userObj.dataValues.id;
     try {
         const url = await TinyUrlModal.findAll({
             attributes: ['original_url'],
             where: {
-                userId: 3,
+                userId: userId,
                 tinyUrl: code
             }
         });
