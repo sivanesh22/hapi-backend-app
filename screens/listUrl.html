@@ -1,0 +1,26 @@
+<html>
+
+<head>
+    <title>URL List</title>
+</head>
+
+<body>
+    <div>
+
+        <th>Long URL</th>
+        <th>Short URL</th>
+
+        <ul>
+            <%for (var url in urlList){%>
+                <li>
+                    <%=JSON.stringify(Object.values(urlList[url]))%>
+                </li>
+                <%}%>
+        </ul>
+    </div>
+</body>
+
+</html>
+<script>
+    let a = `<%=JSON.stringify(urlList) %>`
+</script>

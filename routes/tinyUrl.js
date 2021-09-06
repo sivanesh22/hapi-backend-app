@@ -16,7 +16,15 @@ const redirectTinyUrl = {
 }
 
 
+const fetchAllUrl = {
+    method: 'GET',
+    path: '/fetchAllUrl',
+    config: { auth: 'jwt' },
+    handler: tinyUrlController.fetchAllUrl
+}
+
+
 
 module.exports = [
-    generateTinyURL,redirectTinyUrl
+    generateTinyURL,redirectTinyUrl, fetchAllUrl
 ]

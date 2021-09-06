@@ -116,11 +116,14 @@
         Hai <%= username %>!!!.This is your dashboard
     </p>
     <form action="/generateTinyURL" method="post">
-        <input type="text" name='longUrl' value='https://www.netflix.com/' />
+        <input type="text" name='longUrl' />
         <button type="submit"> Create Tiny Url </button>
     </form>
 
     <button onclick="openModal()"> Add User</button>
+
+    <p>Get all <a href='./fetchAllUrl'>URL from here </a></p>
+
 
     <div id="modal_container" class="modal_container">
         <!-- Modal content -->
@@ -132,24 +135,23 @@
                     <div class="top-row">
                         <input type="hidden" name='account_id' value=<%=account_id %> />
                         <div class="field-wrap">
-                            <input type="text" autocomplete="off" placeholder="Name" name='username'  />
+                            <input type="text" autocomplete="off" placeholder="Name" name='username' />
                         </div>
 
                         <div class="field-wrap">
-                            <input type="text" autocomplete="off" placeholder="Phone number" name='phone'
-                                 />
+                            <input type="text" autocomplete="off" placeholder="Phone number" name='phone' />
                         </div>
                     </div>
 
                     <div class="field-wrap">
-                        <input type="email" autocomplete="off" placeholder="Email" name='email'  />
+                        <input type="email" autocomplete="off" placeholder="Email" name='email' />
                     </div>
 
                     <div class="field-wrap">
                         <input type="password" autocomplete="off" placeholder="Password" name='password' />
                     </div>
 
-                    <button type="submit" class="button button-block">Create User</button>
+                    <button type="submit" onclick="closeModal()" class="button button-block">Create User</button>
 
                 </form>
 

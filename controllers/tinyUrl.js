@@ -5,13 +5,14 @@ const { tinyUrlLength } = require('../config/config');
 const TinyUrlModal = require('../models/TinyUrl');
 const UserModal = require('../models/User');
 const dashboard = './screens/dashboard.html';
+const listUrl = './screens/listUrl.html';
 
 
 async function generateTinyURL(request, reply) {
     const email = request.auth.credentials.email;
-    const userObj= await UserModal.findOne({ attributes: ['id','accountId'], where: { email: email } })
-    const userId=userObj.dataValues.id;
-    const accountId=userObj.dataValues.accountId;
+    const userObj = await UserModal.findOne({ attributes: ['id', 'accountId'], where: { email: email } })
+    const userId = userObj.dataValues.id;
+    const accountId = userObj.dataValues.accountId;
     let longUrl = request.payload.longUrl;
     const shortUrl = nanoid(tinyUrlLength)
     if (validUrl.isUri(longUrl)) {
@@ -55,8 +56,14 @@ async function generateTinyURL(request, reply) {
 async function redirectTinyUrl(request, reply) {
     const { code } = request.params;
     const email = request.auth.credentials.email;
-    const userObj= await UserModal.findOne({ attributes: ['id'], where: { email: email } })
-    const userId=userObj.dataValues.id;
+    let userId;
+    try {
+        let userObj = await UserModal.findOne({ attributes: ['id'], where: { email: email } });
+        userId = userObj.dataValues.id;
+    } catch (err) {
+        console.error(err, 'Error in fetching user details');
+    }
+
     try {
         const url = await TinyUrlModal.findAll({
             attributes: ['original_url'],
@@ -76,6 +83,33 @@ async function redirectTinyUrl(request, reply) {
     }
 }
 
+
+
+async function fetchAllUrl(request, reply) {
+    const email = request.auth.credentials.email;
+    let userId;
+    try {
+        let userObj = await UserModal.findOne({ attributes: ['id'], where: { email: email } });
+        userId = userObj.dataValues.id;
+    } catch (err) {
+        console.error(err, 'Error in fetching user details');
+    }
+    try {
+        let urlData = await TinyUrlModal.findAll({ attributes: ['originalUrl', 'tinyUrl'], where: { userId: userId } });
+        let urlList = [];
+        urlData.forEach((data) => {
+           
+            urlList.push(data.dataValues);
+        });
+        reply.view(listUrl, {
+            urlList
+        })
+    } catch (err) {
+        console.error(err, 'Error');
+    }
+}
+
+
 module.exports = {
-    generateTinyURL, redirectTinyUrl
+    generateTinyURL, redirectTinyUrl, fetchAllUrl
 }
