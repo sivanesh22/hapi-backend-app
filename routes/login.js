@@ -11,15 +11,26 @@ const home = {
     method: 'GET',
     path: '/login',
     handler: loginController.signup,
-    config: { auth: false }
+    config: {
+        auth: false,
+        cors: true
+    },
+
 }
 
 const login = {
     method: 'GET',
     path: '/',
     config: {
+        // validate: {
+        //     payload:
+        //         Joi.object({
+        //             email: Joi.string().required(),
+        //             password: Joi.string().required(),
+        //         })
+        // },
         handler: loginController.signup,
-        auth: false 
+        auth: false
     }
 }
 
@@ -32,5 +43,5 @@ const validateLogin = {
 
 
 module.exports = [
-    signup, login, validateLogin,home
+    signup, validateLogin, home
 ]

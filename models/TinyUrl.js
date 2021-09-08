@@ -16,7 +16,7 @@ var TinyUrl = db.define('tinyurl', {
         type: Sequelize.STRING,
         unique: true
     },
-    isActive:{
+    isActive: {
         field: 'is_active',
         type: Sequelize.BOOLEAN,
     },
@@ -46,8 +46,22 @@ var TinyUrl = db.define('tinyurl', {
     }
 }
     , {
-        freezeTableName: true
+        freezeTableName: true,
+        hooks: {
+            afterUpdate: (user, options) => {
+                console.log(user, '-----1231')
+                user.username = 'Toni';
+            },
+            afterCreate: (user, options) => {
+                console.log(user, '-----1231')
+                user.username = 'Toni';
+            },
+        }
     }
 );
+
+// TinyUrl.addHook('beforeValidate', (user, options) => {
+//     console.log(user, '-----123')
+// });
 module.exports = TinyUrl;
 

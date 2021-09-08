@@ -2,11 +2,15 @@ const loginPath = './screens/login.html';
 const UserModal = require('../models/User');
 const dashboard = './screens/dashboard.html';
 const { createToken } = require('../authentication/Token')
+const redis = require('../redis/Redis')
 
-
-function signup(request, reply) {
+async function signup(request, reply) {
     reply.file(loginPath);
+    // reply({
+    //     name:"siva"
+    // })
 }
+
 
 function login(request, reply) {
     reply.file(loginPath);
@@ -29,6 +33,10 @@ async function validateLogin(request, reply) {
         }
         const fetchedPass = results[0].dataValues.password;
         const fetchedEmail = results[0].dataValues.email;
+        redis.insertData('email', results[0].dataValues.email)
+        redis.insertData('accountId', results[0].dataValues.account_id)
+        redis.insertData('userId', results[0].dataValues.id)
+        redis.insertData('username', results[0].dataValues.username)
         if (fetchedPass === password) {
             const token = createToken(fetchedEmail);
             const cookie_options = {

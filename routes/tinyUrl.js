@@ -10,7 +10,7 @@ const generateTinyURL = {
 
 const redirectTinyUrl = {
     method: 'GET',
-    path: '/{code}',
+    path: '/code',
     handler: tinyUrlController.redirectTinyUrl,
     config: { auth: 'jwt' }
 }
@@ -24,7 +24,14 @@ const fetchAllUrl = {
 }
 
 
+const removeTinyUrl = {
+    method: 'POST',
+    path: '/removeTinyUrl',
+    config: { auth: 'jwt' },
+    handler: tinyUrlController.removeTinyUrl
+}
+
 
 module.exports = [
-    generateTinyURL,redirectTinyUrl, fetchAllUrl
+    generateTinyURL,redirectTinyUrl, fetchAllUrl, removeTinyUrl
 ]

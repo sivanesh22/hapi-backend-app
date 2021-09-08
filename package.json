@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "boom": "^7.3.0",
+    "bull": "^3.12.0",
     "catbox-redis": "^4.2.4",
     "config": "^3.3.6",
     "create-require": "^1.1.1",
@@ -26,7 +27,10 @@
     "jsonwebtoken": "^8.5.1",
     "module": "^1.2.5",
     "nanoid": "^3.1.25",
+    "nodemailer": "^6.6.3",
     "pg": "^8.7.1",
+    "redis": "^3.1.2",
+    "require-directory": "^2.1.1",
     "sequelize": "^5.22.4",
     "sequelize-cli": "^5.5.1",
     "store": "^2.0.12",

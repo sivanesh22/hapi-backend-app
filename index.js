@@ -1,13 +1,12 @@
 'use strict';
 const Hapi = require('hapi');
+const process = require('process')
+const config = require('config')
 const ejs = require('ejs');
-const server = new Hapi.Server();
+const server = new Hapi.Server({ connections: {routes: { cors: true } }});
 const db = require('./config/database');
 const Routes = require('./routes/index')
-// const { secret } = require('./config/config');
-// const UserModal = require('./models/User');
 const { strategy } = require('./strategy/strategy');
-const serverData = require('./config/default.json');
 const plugin = require('./plugins/Plugins');
 
 (async function () {
@@ -16,23 +15,21 @@ const plugin = require('./plugins/Plugins');
         console.log('Database connected in postgres')
     } catch (e) {
         console.error(e, 'database connection failed');
+        process.exit()
     }
 
     server.connection({
-        port: serverData.server.port,
-        host: serverData.server.host
+        port: config.get('server.port'),
+        host: config.get('server.host'),
     });
 
+    try {
+        await server.register(plugin);
+    } catch (e) {
+        console.error(e, 'server register failed');
+    }
+
    
-    // server.ext('onPreHandler', function (request, h) {
-    //     console.log('inside onPreHandler', '-----', h);
-    //     return h.continue;
-    //     // return h.continue;
-    // });
-
-  
-
-    await server.register(plugin);
 
     server.views({
         engines: { html: ejs },
