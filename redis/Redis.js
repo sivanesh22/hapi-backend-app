@@ -2,7 +2,9 @@ const redis = require("redis");
 const config = require('config')
 const client = redis.createClient(config.get('redis.port'));
 
-const insertData = (key, value, time = 3000) => {
+//data stored - userInfo , tinyurl and org url
+
+const insertData = (key, value, time = 300000) => {
     client.setex(key, time, value);
     
 }

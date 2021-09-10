@@ -13,7 +13,6 @@ const home = {
     handler: loginController.signup,
     config: {
         auth: false,
-        cors: true
     },
 
 }
@@ -42,6 +41,14 @@ const validateLogin = {
 };
 
 
+const logout = {
+    method: 'GET',
+    path: '/logout',
+    handler: loginController.logout,
+    config: { auth: 'jwt' },
+};
+
+
 module.exports = [
-    signup, validateLogin, home
+    signup, validateLogin, home, logout
 ]

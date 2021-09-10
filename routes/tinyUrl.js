@@ -10,7 +10,7 @@ const generateTinyURL = {
 
 const redirectTinyUrl = {
     method: 'GET',
-    path: '/code',
+    path: '/tinyurl/{code}',
     handler: tinyUrlController.redirectTinyUrl,
     config: { auth: 'jwt' }
 }

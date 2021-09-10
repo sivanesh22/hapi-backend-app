@@ -3,7 +3,10 @@ const Hapi = require('hapi');
 const process = require('process')
 const config = require('config')
 const ejs = require('ejs');
-const server = new Hapi.Server({ connections: {routes: { cors: true } }});
+const server = new Hapi.Server({ connections: {routes: { cors: {
+    origin:['*'],
+    credentials:true
+} } }});
 const db = require('./config/database');
 const Routes = require('./routes/index')
 const { strategy } = require('./strategy/strategy');

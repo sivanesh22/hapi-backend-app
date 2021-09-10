@@ -7,19 +7,15 @@ const TinyUrlModal = require('../models/TinyUrl');
 const dashboard = './screens/dashboard.html';
 const listUrl = './screens/listUrl.html';
 const redis = require('../redis/Redis')
-const { sendMail } = require('../mailTrigger')
+const { sendMail } = require('../mailTrigger');
+const { generateUserInfo } = require('../helpers/helpers');
 
 async function generateTinyURL(request, reply) {
-    let userId;
-    let accountId;
-    let username;
-    try {
-        userId = await redis.fetchData('userId');
-        accountId = await redis.fetchData('accountId');
-        username = await redis.fetchData('username');
-    } catch (err) {
-        console.error(err, 'Error in fetching data from redis');
-    }
+    const email = request.auth.credentials.email;
+    let userInfo = await generateUserInfo(email);
+    console.log(userInfo,'userInfouserInfo--')
+    const userId = userInfo.id;
+    const accountId = userInfo.accountId;
     let longUrl = request.payload.longUrl;
     let shortUrl = nanoid(tinyUrlLength);
     var isUniqueShortUrl = false;
@@ -54,10 +50,10 @@ async function generateTinyURL(request, reply) {
             if (url.length) {
                 console.log('exists')
             } else {
-                redis.insertData(shortUrl, longUrl)
-                const constructedShortUrl = `${config.get('server.transferProtocol')}${config.get('server.host')}:${config.get('server.port')}/${shortUrl}`;
-                const message = `Hi ${username} , as per you request ${constructedShortUrl} will be the tinyurl for ${longUrl} `
-                sendMail('mostwanted04259@gmail.com', 'New Tiny URL Generated', message)
+                // redis.insertData(shortUrl, longUrl)
+                // const constructedShortUrl = `${config.get('server.transferProtocol')}${config.get('server.host')}:${config.get('server.port')}/${shortUrl}`;
+                // const message = `Hi ${username} , as per you request ${constructedShortUrl} will be the tinyurl for ${longUrl} `
+                // sendMail('mostwanted04259@gmail.com', 'New Tiny URL Generated', message)
                 await TinyUrlModal.create({
                     originalUrl: longUrl,
                     tinyUrl: shortUrl,
@@ -68,9 +64,8 @@ async function generateTinyURL(request, reply) {
                     // createdAt: '',
                     // updatedAt: '',
                 });
-                reply.view(dashboard, {
-                    username: username,
-                    account_id: accountId
+                reply({
+                    newTinyurlCreated: true
                 })
             }
         }
@@ -85,6 +80,7 @@ async function generateTinyURL(request, reply) {
 
 
 async function redirectTinyUrl(request, reply) {
+    const email = request.auth.credentials.email;
     const { code } = request.params;
     let originalUrl;
     try {
@@ -95,12 +91,8 @@ async function redirectTinyUrl(request, reply) {
     if (originalUrl) {
         reply.redirect(originalUrl)
     } else {
-        let userId;
-        try {
-            userId = await redis.fetchData('userId');
-        } catch (err) {
-            console.error(err, 'Error in fetching user details');
-        }
+        let userInfo = await generateUserInfo(email);
+        const userId = userInfo.id;
         try {
             const url = await TinyUrlModal.findAll({
                 attributes: ['original_url'],
@@ -125,19 +117,15 @@ async function redirectTinyUrl(request, reply) {
 
 async function fetchAllUrl(request, reply) {
     const email = request.auth.credentials.email;
-    let userId;
-    try {
-        userId = await redis.fetchData('userId');
-    } catch (err) {
-        console.error(err, 'Error in fetching user details');
-    }
+    let userInfo = await generateUserInfo(email);
+    const userId = userInfo.id;
     try {
         let urlData = await TinyUrlModal.findAll({ attributes: ['originalUrl', 'tinyUrl'], where: { userId: userId, isActive: true } });
         let urlList = [];
         urlData.forEach((data) => {
             urlList.push(data.dataValues);
         });
-        reply.view(listUrl, {
+        reply({
             urlList
         })
     } catch (err) {
@@ -147,12 +135,9 @@ async function fetchAllUrl(request, reply) {
 
 async function removeTinyUrl(request, reply) {
     const { tinyUrl } = request.payload;
-    let userId;
-    try {
-        userId = await redis.fetchData('userId');
-    } catch (err) {
-        console.error(err, 'Error in fetching user details');
-    }
+    const email = request.auth.credentials.email;
+    let userInfo = await generateUserInfo(email);
+    const userId = userInfo.id;
     try {
         await TinyUrlModal.update({ isActive: false }, { where: { tinyUrl: tinyUrl }, individualHooks: true });
     } catch (err) {
@@ -163,7 +148,7 @@ async function removeTinyUrl(request, reply) {
     urlData.forEach((data) => {
         urlList.push(data.dataValues);
     });
-    reply.view(listUrl, {
+    reply({
         urlList
     })
 }
