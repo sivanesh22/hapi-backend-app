@@ -13,7 +13,7 @@ const { generateUserInfo } = require('../helpers/helpers');
 async function generateTinyURL(request, reply) {
     const email = request.auth.credentials.email;
     let userInfo = await generateUserInfo(email);
-    console.log(userInfo,'userInfouserInfo--')
+    console.log(userInfo, 'userInfouserInfo--')
     const userId = userInfo.id;
     const accountId = userInfo.accountId;
     let longUrl = request.payload.longUrl;
@@ -50,10 +50,7 @@ async function generateTinyURL(request, reply) {
             if (url.length) {
                 console.log('exists')
             } else {
-                // redis.insertData(shortUrl, longUrl)
-                // const constructedShortUrl = `${config.get('server.transferProtocol')}${config.get('server.host')}:${config.get('server.port')}/${shortUrl}`;
-                // const message = `Hi ${username} , as per you request ${constructedShortUrl} will be the tinyurl for ${longUrl} `
-                // sendMail('mostwanted04259@gmail.com', 'New Tiny URL Generated', message)
+                redis.insertData(shortUrl, longUrl)
                 await TinyUrlModal.create({
                     originalUrl: longUrl,
                     tinyUrl: shortUrl,
@@ -114,6 +111,16 @@ async function redirectTinyUrl(request, reply) {
 }
 
 
+async function shareTinyUrlViaEmail(request, reply) {
+    const { tinyUrl, originalUrl , emailList} = request.payload;
+    const constructedShortUrl = `${config.get('server.transferProtocol')}${config.get('server.host')}:${config.get('server.port')}/${tinyUrl}`;
+    const message = `Hi , as per you request ${constructedShortUrl} will be the tinyurl for ${originalUrl} `
+    sendMail(emailList, 'New Tiny URL Generated', message)
+    reply({
+        success: true
+    })
+}
+
 
 async function fetchAllUrl(request, reply) {
     const email = request.auth.credentials.email;
@@ -155,5 +162,5 @@ async function removeTinyUrl(request, reply) {
 
 
 module.exports = {
-    generateTinyURL, redirectTinyUrl, fetchAllUrl, removeTinyUrl
+    generateTinyURL, redirectTinyUrl, fetchAllUrl, removeTinyUrl, shareTinyUrlViaEmail
 }

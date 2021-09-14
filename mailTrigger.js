@@ -4,7 +4,7 @@ const config = require('config')
 const nodemailer = require('nodemailer');
 // 1. Initiating the Queue
 
-const sendMail = (toEmail,subject,message) => {
+const sendMail = (toEmail, subject, message) => {
   const sendMailQueue = new Queue('sendMail', {
     redis: {
       host: config.get('redis.host'),
@@ -13,7 +13,7 @@ const sendMail = (toEmail,subject,message) => {
     }
   });
   const data = {
-    toEmail: 'mostwanted04259@gmail.com',
+    toEmail: toEmail,
     subject,
     message
   };

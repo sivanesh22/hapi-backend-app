@@ -24,6 +24,13 @@ const fetchAllUrl = {
 }
 
 
+const shareTinyUrlViaEmail = {
+    method: 'POST',
+    path: '/shareTinyUrlViaEmail',
+    config: { auth: 'jwt' },
+    handler: tinyUrlController.shareTinyUrlViaEmail
+}
+
 const removeTinyUrl = {
     method: 'POST',
     path: '/removeTinyUrl',
@@ -33,5 +40,5 @@ const removeTinyUrl = {
 
 
 module.exports = [
-    generateTinyURL,redirectTinyUrl, fetchAllUrl, removeTinyUrl
+    generateTinyURL,redirectTinyUrl, fetchAllUrl, removeTinyUrl, shareTinyUrlViaEmail
 ]
