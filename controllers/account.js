@@ -1,12 +1,8 @@
 const UserModal = require('../models/User');
 const AccountModal = require('../models/Account');
 const RoleModal = require('../models/Role');
-const dashboard = './screens/dashboard.html';
 const { createToken } = require('../authentication/Token')
 const sequelize = require('../config/database');
-// const redis = require("redis");
-// const config = require('config')
-// const client = redis.createClient(config.get('redis.port'));
 const redis = require('../redis/Redis')
 
 
