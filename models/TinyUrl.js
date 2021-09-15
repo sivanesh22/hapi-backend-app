@@ -49,11 +49,11 @@ var TinyUrl = db.define('tinyurl', {
         freezeTableName: true,
         hooks: {
             afterUpdate: (user, options) => {
-                console.log(user, '-----1231')
+                // console.log(user, '-----1231')
                 user.username = 'Toni';
             },
             afterCreate: (user, options) => {
-                console.log(user, '-----1231')
+                // console.log(user, '-----1231')
                 user.username = 'Toni';
             },
         }

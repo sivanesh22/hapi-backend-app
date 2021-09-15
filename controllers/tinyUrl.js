@@ -11,22 +11,21 @@ const { generateUserInfo } = require('../helpers/helpers');
 async function generateTinyURL(request, reply) {
     const email = request.auth.credentials.email;
     let userInfo = await generateUserInfo(email);
-    console.log(userInfo, 'userInfouserInfo--')
     const userId = userInfo.id;
     const accountId = userInfo.accountId;
     let longUrl = request.payload.longUrl;
-    let shortUrl = nanoid(tinyUrlLength);
-    var isUniqueShortUrl = false;
+    let shortUrl = nanoid(config.get('tokenData.tinyUrlLength'));
+    let isUniqueShortUrl = false;
     while (!isUniqueShortUrl) {
         try {
-            const url = await TinyUrlModal.findAll({
+            const url = await TinyUrlModal.findOne({
                 attributes: ['tiny_url', 'original_url'],
                 where: {
                     tinyUrl: shortUrl,
                 }
             });
-            if (url.length) {
-                shortUrl = nanoid(tinyUrlLength);
+            if (url) {
+                shortUrl = nanoid(config.get('tokenData.tinyUrlLength'));
             } else {
                 isUniqueShortUrl = true;
             }
@@ -38,17 +37,20 @@ async function generateTinyURL(request, reply) {
     }
     if (validUrl.isUri(longUrl)) {
         try {
-            const url = await TinyUrlModal.findAll({
+            const url = await TinyUrlModal.findOne({
                 attributes: ['tiny_url', 'original_url'],
                 where: {
                     userId: userId,
                     originalUrl: longUrl
                 }
             });
-            if (url.length) {
-                console.log('exists')
+            if (url) {
+                reply({
+                    newTinyurlCreated: false,
+                    alreadyExists: true
+                })
             } else {
-                redis.insertData(shortUrl, longUrl)
+                await redis.insertData(shortUrl, longUrl)
                 await TinyUrlModal.create({
                     originalUrl: longUrl,
                     tinyUrl: shortUrl,
@@ -57,7 +59,8 @@ async function generateTinyURL(request, reply) {
                     accountId: accountId,
                 });
                 reply({
-                    newTinyurlCreated: true
+                    newTinyurlCreated: true,
+                    alreadyExists: false
                 })
             }
         }
@@ -86,15 +89,15 @@ async function redirectTinyUrl(request, reply) {
         let userInfo = await generateUserInfo(email);
         const userId = userInfo.id;
         try {
-            const url = await TinyUrlModal.findAll({
-                attributes: ['original_url'],
+            const url = await TinyUrlModal.findOne({
+                attributes: ['originalUrl'],
                 where: {
                     userId: userId,
                     tinyUrl: code
                 }
             });
-            if (url.length) {
-                reply.redirect(url[0].dataValues.original_url)
+            if (url) {
+                reply.redirect(url.original_url)
             } else {
                 console.log('Invalid Url')
             }

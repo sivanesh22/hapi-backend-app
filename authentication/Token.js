@@ -1,25 +1,12 @@
 
 'use strict';
-
 const jwt = require('jsonwebtoken');
-const { secret } = require('../config/config');
-const store = require('store')
+const config = require('config');
 
 function createToken(user) {
-    return jwt.sign({ email: user }, secret, { algorithm: 'HS256', expiresIn: "10h" });
-}
-
-function authenticate() {
-    const value = store.get('token')
-    jwt.verify(value.token, secret, (err, user) => {
-        if (err) {
-            return console.log('failed', err)
-        }
-        return console.log('success', user)
-    });
+    return jwt.sign({ email: user }, config.get('tokenData.secret'), { algorithm: 'HS256', expiresIn: "10h" });
 }
 
 module.exports = {
     createToken,
-    authenticate
 };

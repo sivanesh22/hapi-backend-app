@@ -1,10 +1,10 @@
-const { secret } = require('../config/config');
 const UserModal = require('../models/User');
+const config = require('config');
 
 
 function strategy() {
     return (('jwt', 'jwt', {
-        key: secret,
+        key: config.get('tokenData.secret'),
         validateFunc: validate,
         verifyOptions: { algorithms: ['HS256'] },
     }))

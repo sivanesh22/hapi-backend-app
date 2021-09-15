@@ -1,10 +1,11 @@
 const UserModal = require('../models/User');
 const redis = require('../redis/Redis')
+var bcrypt = require('bcryptjs');
 
 async function generateUserInfo(email) {
     let userData = ''
     try {
-        userInfo = await redis.fetchData(email);
+        userData = await redis.fetchData(email);
     } catch (err) {
         console.error(err, 'Error in fetching user details');
     }
@@ -13,13 +14,12 @@ async function generateUserInfo(email) {
     } else {
         try {
             const userInfo = await UserModal.findOne({
-                attributes: ['username', 'account_id', 'email', 'id'],
+                attributes: ['userName', 'accountId', 'email', 'id'],
                 where: {
                     email: email,
                 }
             });
-            userInfo.accountId = userInfo.dataValues.account_id;
-            redis.insertData(email, JSON.stringify(userInfo.dataValues))
+            await redis.insertData(email, JSON.stringify(userInfo.dataValues))
             return userInfo.dataValues
         } catch (err) {
             console.error(err, 'Error in fetching user details');
@@ -27,6 +27,31 @@ async function generateUserInfo(email) {
     }
 }
 
+async function encrypyPassword(pass) {
+    try {
+        const hash = await bcrypt.hash(pass, 10);
+        return hash
+    } catch (e) {
+        console.error(e, 'Hashing password failed');
+    }
+}
+
+
+async function checkPassword(password,dbPassword) {
+    try {
+        const isPasswordValid = await bcrypt.compare(password,dbPassword);
+        return isPasswordValid
+    } catch (e) {
+        console.error(e, 'Hashing password failed');
+    }
+
+
+    return hash
+}
+
+
 module.exports = {
-    generateUserInfo
+    generateUserInfo,
+    encrypyPassword,
+    checkPassword
 }

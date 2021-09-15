@@ -1,59 +1,45 @@
 const UserModal = require('../models/User');
 const { createToken } = require('../authentication/Token')
-const redis = require('../redis/Redis')
+const redis = require('../redis/Redis');
+const { checkPassword } = require('../helpers/helpers');
+const { cookie_options } = require('../config/Constants');
 
 async function validateLogin(request, reply) {
-    if (request) {
-        let email = request.payload.email;
-        let password = request.payload.password;
-        var results = []
-        try {
-            results = await UserModal.findAll({
-                attributes: ['password', 'username', 'account_id', 'email', 'id'],
-                where: {
-                    email: email,
-                    password: password,
-                }
-            });
-        } catch (e) {
-            console.error(e, 'Unable to fetch account details');
-        }
-        if (results.length) {
-            const fetchedPass = results[0].dataValues.password;
-            const fetchedEmail = results[0].dataValues.email;
-            if (fetchedPass === password) {
-                const userDetails = {
-                    email: results[0].dataValues.email,
-                    accountId: results[0].dataValues.account_id,
-                    id: results[0].dataValues.id,
-                    username: results[0].dataValues.username
-                }
-                redis.insertData(results[0].dataValues.email, JSON.stringify(userDetails))
-                const token = createToken(fetchedEmail);
-                const cookie_options = {
-                    ttl: 1 * 24 * 60 * 60 * 1000, // expires after a day
-                    encoding: 'none',
-                    isSecure: true,
-                    isHttpOnly: true,
-                    clearInvalid: false,
-                    strictHeader: true,
-                    isSameSite: false,
-                    path: '/',
-                }
-                let data = {
-                    isCredentialValid: true,
-                    userDetails,
-                    c1: token,
-                };
-                reply(data).header("Authorization", token).state("token", token, cookie_options);
-
+    let email = request.payload.email;
+    let password = request.payload.password;
+    let results;
+    try {
+        results = await UserModal.findOne({
+            attributes: ['password', 'userName', 'accountId', 'email', 'id'],
+            where: {
+                email: email,
             }
-        } else {
-            reply({
-                isCredentialValid: false,
-                userDetails: {}
-            })
+        });
+    } catch (e) {
+        console.error(e, 'Unable to fetch account details');
+    }
+    const isPasswordValid = await checkPassword(password, results.password)
+    const fetchedEmail = results.email;
+    if (isPasswordValid) {
+        const userDetails = {
+            email: results.email,
+            accountId: results.accountId,
+            id: results.id,
+            username: results.userName
         }
+        await redis.insertData(results.email, JSON.stringify(userDetails))
+        const token = createToken(fetchedEmail);
+        let data = {
+            isCredentialValid: true,
+            userDetails,
+            c1: token,
+        };
+        reply(data).header("Authorization", token).state("token", token, cookie_options);
+    } else {
+        reply({
+            isCredentialValid: false,
+            userDetails: {}
+        })
     }
 }
 

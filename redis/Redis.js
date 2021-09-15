@@ -4,9 +4,9 @@ const client = redis.createClient(config.get('redis.port'));
 
 //data stored - userInfo , tinyurl and org url
 
-const insertData = (key, value, time = 300000) => {
-    client.setex(key, time, value);
-    
+const insertData = async (key, value, time = 300000) => {
+    await client.setex(key, time, value);
+
 }
 
 
@@ -18,8 +18,8 @@ const fetchData = (data) => {
     })
 }
 
-const deleteData = (data) => {
-    client.DEL(key)
+const deleteData = async (data) => {
+    await client.DEL(data)
 }
 
 module.exports = {
