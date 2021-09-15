@@ -54,8 +54,11 @@ async function saveAccountandUser(request, reply) {
             userDetails,
             c1: token,
         };
-        reply(data).header("Authorization", token).state("token", token, cookie_options);
+        reply(data).state("token", token, cookie_options);
     } catch (err) {
+        reply({
+            errorMsg:'Error in creating account'
+        }).code(500);
         console.log(err, 'error in signup controller')
     }
 

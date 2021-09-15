@@ -6,13 +6,9 @@ async function generateUserInfo(email) {
     let userData = ''
     try {
         userData = await redis.fetchData(email);
-    } catch (err) {
-        console.error(err, 'Error in fetching user details');
-    }
-    if (userData) {
-        return JSON.parse(userData)
-    } else {
-        try {
+        if (userData) {
+            return JSON.parse(userData)
+        } else {
             const userInfo = await UserModal.findOne({
                 attributes: ['userName', 'accountId', 'email', 'id'],
                 where: {
@@ -21,9 +17,9 @@ async function generateUserInfo(email) {
             });
             await redis.insertData(email, JSON.stringify(userInfo.dataValues))
             return userInfo.dataValues
-        } catch (err) {
-            console.error(err, 'Error in fetching user details');
         }
+    } catch (err) {
+        console.error(err, 'Error in generateUserInfo');
     }
 }
 
@@ -37,16 +33,13 @@ async function encrypyPassword(pass) {
 }
 
 
-async function checkPassword(password,dbPassword) {
+async function checkPassword(password, dbPassword) {
     try {
-        const isPasswordValid = await bcrypt.compare(password,dbPassword);
+        const isPasswordValid = await bcrypt.compare(password, dbPassword);
         return isPasswordValid
     } catch (e) {
         console.error(e, 'Hashing password failed');
     }
-
-
-    return hash
 }
 
 

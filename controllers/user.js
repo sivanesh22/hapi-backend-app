@@ -6,13 +6,13 @@ const redis = require('../redis/Redis')
 
 async function addUser(request, reply) {
     const email = request.auth.credentials.email;
-    let userInfo = await generateUserInfo(email);
-    let userData = {};
-    userData = request.payload;
-    userData.password = await encrypyPassword(request.payload.password);
-    userData.accountId = userInfo.accountId;
-    let data = []
     try {
+        let userInfo = await generateUserInfo(email);
+        let userData = {};
+        userData = request.payload;
+        userData.password = await encrypyPassword(request.payload.password);
+        userData.accountId = userInfo.accountId;
+        let data = []
         data = await RoleModal.findOne({
             attributes: ['id'],
             where: {
@@ -20,10 +20,6 @@ async function addUser(request, reply) {
                 accountId: userInfo.accountId,
             }
         });
-    } catch (e) {
-        console.error(e, 'Unable to find role id');
-    }
-    try {
         userData.id = data.id;
         await UserModal.create({
             userName: userData.username,
@@ -33,13 +29,18 @@ async function addUser(request, reply) {
             accountId: userData.accountId,
             roleId: userData.id
         });
+
+        await redis.insertData(userData.email, JSON.stringify(userData))
+        reply({
+            userCreated: true
+        })
     } catch (e) {
         console.error(e, 'Unable to add user to the account');
+        reply({
+            userCreated: false
+        }).code(500);
     }
-    await redis.insertData(userData.email, JSON.stringify(userData))
-    reply({
-        userCreated: true
-    })
+
 }
 
 

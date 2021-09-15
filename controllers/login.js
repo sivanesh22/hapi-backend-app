@@ -15,31 +15,34 @@ async function validateLogin(request, reply) {
                 email: email,
             }
         });
+        const isPasswordValid = await checkPassword(password, results.password)
+        const fetchedEmail = results.email;
+        if (isPasswordValid) {
+            const userDetails = {
+                email: results.email,
+                accountId: results.accountId,
+                id: results.id,
+                username: results.userName
+            }
+            await redis.insertData(results.email, JSON.stringify(userDetails))
+            const token = createToken(fetchedEmail);
+            let data = {
+                isCredentialValid: true,
+                userDetails,
+                c1: token,
+            };
+            reply(data).state("token", token, cookie_options);
+        } else {
+            reply({
+                isCredentialValid: false,
+                userDetails: {}
+            })
+        }
     } catch (e) {
         console.error(e, 'Unable to fetch account details');
-    }
-    const isPasswordValid = await checkPassword(password, results.password)
-    const fetchedEmail = results.email;
-    if (isPasswordValid) {
-        const userDetails = {
-            email: results.email,
-            accountId: results.accountId,
-            id: results.id,
-            username: results.userName
-        }
-        await redis.insertData(results.email, JSON.stringify(userDetails))
-        const token = createToken(fetchedEmail);
-        let data = {
-            isCredentialValid: true,
-            userDetails,
-            c1: token,
-        };
-        reply(data).header("Authorization", token).state("token", token, cookie_options);
-    } else {
         reply({
-            isCredentialValid: false,
-            userDetails: {}
-        })
+            errorMsg:'Error in Validating credentials'
+        }).code(500);
     }
 }
 

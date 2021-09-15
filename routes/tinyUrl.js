@@ -4,8 +4,17 @@ const tinyUrlController = require('../controllers/tinyUrl')
 const generateTinyURL = {
     method: 'POST',
     path: '/generateTinyURL',
-    handler: tinyUrlController.generateTinyURL,
-    config: { auth: 'jwt' }
+    // config: { auth: 'jwt' }
+    config: {
+        // validate: {
+        //     payload:
+        //         Joi.object({
+        //             longUrl: Joi.string().required(),
+        //         })
+        // },
+        handler: tinyUrlController.generateTinyURL,
+        auth: 'jwt',
+    },
 }
 
 const redirectTinyUrl = {
@@ -40,5 +49,5 @@ const removeTinyUrl = {
 
 
 module.exports = [
-    generateTinyURL,redirectTinyUrl, fetchAllUrl, removeTinyUrl, shareTinyUrlViaEmail
+    generateTinyURL, redirectTinyUrl, fetchAllUrl, removeTinyUrl, shareTinyUrlViaEmail
 ]
