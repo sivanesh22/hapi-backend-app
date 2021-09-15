@@ -4,8 +4,6 @@ const { nanoid } = require('nanoid')
 const config = require('config')
 const { tinyUrlLength } = require('../config/config');
 const TinyUrlModal = require('../models/TinyUrl');
-const dashboard = './screens/dashboard.html';
-const listUrl = './screens/listUrl.html';
 const redis = require('../redis/Redis')
 const { sendMail } = require('../mailTrigger');
 const { generateUserInfo } = require('../helpers/helpers');
@@ -57,9 +55,6 @@ async function generateTinyURL(request, reply) {
                     isActive: true,
                     userId: userId,
                     accountId: accountId,
-                    // expiryDate: '',
-                    // createdAt: '',
-                    // updatedAt: '',
                 });
                 reply({
                     newTinyurlCreated: true

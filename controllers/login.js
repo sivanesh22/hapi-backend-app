@@ -1,19 +1,6 @@
-const loginPath = './screens/login.html';
 const UserModal = require('../models/User');
 const { createToken } = require('../authentication/Token')
 const redis = require('../redis/Redis')
-
-async function signup(request, reply) {
-    reply.file(loginPath);
-    // reply({
-    //     name: "siva"
-    // })
-}
-
-
-function login(request, reply) {
-    reply.file(loginPath);
-}
 
 async function validateLogin(request, reply) {
     if (request) {
@@ -75,15 +62,6 @@ function logout(request, reply) {
 }
 
 module.exports = {
-    signup,
-    login,
     validateLogin,
     logout
 }
-
-// "data", {
-//     userId: results[0].dataValues.id,
-//     accountId: results[0].dataValues.account_id,
-//     username: results[0].dataValues.username,
-//     userEmail: results[0].dataValues.email,
-// }

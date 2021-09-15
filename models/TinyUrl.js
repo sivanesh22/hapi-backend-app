@@ -60,8 +60,5 @@ var TinyUrl = db.define('tinyurl', {
     }
 );
 
-// TinyUrl.addHook('beforeValidate', (user, options) => {
-//     console.log(user, '-----123')
-// });
 module.exports = TinyUrl;
 
