@@ -1,8 +1,6 @@
 
-const validUrl = require('valid-url')
 const { nanoid } = require('nanoid')
 const config = require('config')
-const { tinyUrlLength } = require('../config/config');
 const TinyUrlModal = require('../models/TinyUrl');
 const redis = require('../redis/Redis')
 const { sendMail } = require('../mailTrigger');
@@ -14,9 +12,7 @@ async function generateTinyURL(request, reply) {
     const userId = userInfo.id;
     const accountId = userInfo.accountId;
     let longUrl = request.payload.longUrl;
-    //pass key as url+accountId+userId
     let shortUrl = nanoid(config.get('tokenData.tinyUrlLength'));
-    if (validUrl.isUri(longUrl)) {
         try {
             const url = await TinyUrlModal.findOne({
                 attributes: ['tiny_url', 'original_url'],
@@ -52,9 +48,7 @@ async function generateTinyURL(request, reply) {
                 alreadyExists: false
             }).code(500);
         }
-    } else {
-        console.log('Invalid longUrl')
-    }
+   
 }
 
 
