@@ -39,7 +39,7 @@ const sendMail = (toEmail, subject, message) => {
         service: 'gmail',
         auth: {
           user: 'mageshravi902@gmail.com',
-          pass: 'm@geshr@vI902'
+          pass: ''
         }
       };
       nodemailer.createTransport(mailConfig).sendMail(mailOptions, (err, info) => {
